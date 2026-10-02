@@ -1,0 +1,36 @@
+Flaky Test Detection Report
+===========================
+
+Projects analyzed successfully: 100
+
+1. How many flaky tests were detected by iDFlakies?
+   47
+
+2. How many flaky tests were detected by NonDex?
+   1,008
+
+3. How many flaky tests were detected by both iDFlakies and NonDex?
+   0
+
+4. How many unique flaky tests were detected across both tools?
+   1,055
+
+Comparison Against Existing IDoFT Data
+======================================
+
+The detected flaky tests were compared against the current IDoFT dataset using
+repository URL and fully-qualified test name.
+
+iDFlakies:
+- Total detected: 47
+- Already present in IDoFT: 14
+- Newly detected: 33
+
+NonDex:
+- Total detected: 1,008
+- Already present in IDoFT: 0
+- Newly detected: 1,008
+
+Total unique newly detected flaky tests across both tools: 1,041
+
+The newly detected tests are listed in new_flaky_tests.csv.

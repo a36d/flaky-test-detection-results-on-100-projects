@@ -1,0 +1,15 @@
+project_name,project_url,sha,detector,flaky_test
+Sentinel,https://github.com/alibaba/Sentinel,051d583fd89a8ecd509d182a1883335119f1a8bf,idflakies,com.alibaba.csp.sentinel.adapter.reactor.MonoSentinelOperatorIntegrationTest.testEmitSingleLongTimeRt
+hadoop,https://github.com/apache/hadoop,a585a73c3e02ac62350c136643a5e7f6095a3dbb,idflakies,org.apache.hadoop.crypto.key.kms.server.TestKMS.testStartStopHttpPseudo
+hadoop,https://github.com/apache/hadoop,a585a73c3e02ac62350c136643a5e7f6095a3dbb,idflakies,org.apache.hadoop.crypto.key.kms.server.TestKMSAudit.testAggregationUnauth
+jicofo,https://github.com/jitsi/jicofo,2cae36e1e6781b438e52156d82cc32f8dea021b9,idflakies,org.jitsi.jicofo.RolesTest.testPassModeratorRole
+jicofo,https://github.com/jitsi/jicofo,2cae36e1e6781b438e52156d82cc32f8dea021b9,idflakies,org.jitsi.jicofo.XmppTest.testAllocateConference
+jicofo,https://github.com/jitsi/jicofo,2cae36e1e6781b438e52156d82cc32f8dea021b9,idflakies,org.jitsi.jicofo.auth.ShibbolethAuthenticationAuthorityTest.testShibbolethAuthenticationModule
+jicofo,https://github.com/jitsi/jicofo,2cae36e1e6781b438e52156d82cc32f8dea021b9,idflakies,org.jitsi.jicofo.auth.XMPPAuthenticationAuthorityTest.testXmppDomainAuthentication
+jnr-posix,https://github.com/jnr/jnr-posix,dbda72ce198a8dd766c30c591d63d726d2a28a7c,idflakies,jnr.posix.GroupTest.getgroups
+jnr-posix,https://github.com/jnr/jnr-posix,dbda72ce198a8dd766c30c591d63d726d2a28a7c,idflakies,jnr.posix.NlLanginfoTest.testNlLanginfo
+nacos,https://github.com/alibaba/nacos,525672272ecb00cd769a13c7b21a8e51cf873f25,idflakies,com.alibaba.nacos.api.naming.pojo.healthcheck.HealthCheckerFactoryTest.testDeserializeExtend
+semanticvectors,https://github.com/Lucky-Dhakad/semanticvectors,cf2d883c5fafd84ca2530fb15e62ba399ebc7176,idflakies,pitt.search.semanticvectors.integrationtests.RegressionTests.testBuildAndSearchComplexPermutationIndex
+tessera,https://github.com/ConsenSys/tessera,ecdd1a2ce6412c11a8ae722d7a4527a4a66da688,idflakies,com.quorum.tessera.eclipselink.AtomicLongSequenceTest.customisedWithNullDbLogin
+tessera,https://github.com/ConsenSys/tessera,ecdd1a2ce6412c11a8ae722d7a4527a4a66da688,idflakies,com.quorum.tessera.eclipselink.AtomicLongSequenceTest.onDisconnectDoesNothing
+tomcat_exporter,https://github.com/nlighten/tomcat_exporter,69b30031ed7099a83cb575d429bf7fddb77f0c0a,idflakies,nl.nlighten.prometheus.tomcat.TomcatGenericExportsTest.testRequestProcessorMetrics
