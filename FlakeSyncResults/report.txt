@@ -1,0 +1,222 @@
+FlakeSync Evaluation Report
+===========================
+
+Overview
+--------
+Phase 1 evaluated 100 Maven projects using iDFlakies and NonDex. After
+excluding flaky tests already documented in the current iDoFT dataset,
+1,041 newly discovered flaky tests were selected for FlakeSync analysis.
+
+The 1,041 tests came from 77 distinct projects:
+- iDFlakies: 33 tests
+- NonDex: 1,008 tests
+
+FlakeSync was run using the following six phases:
+
+1. concurrentfind
+2. delaylocs
+3. deltadebug
+4. critsearch
+5. barrierpointsearch
+6. patch
+
+FlakeSync source commit:
+54ebfa3
+
+For timeout-controlled runs, the final per-phase timeout was 1,800 seconds.
+Raw runner results were preserved in flakesync_results.csv. Because several
+raw Maven-level statuses did not accurately describe the underlying
+FlakeSync outcome, logs and generated artifacts were inspected and a
+separate refined classification was written to
+flakesync_results_classified.csv.
+
+
+Refined Results
+---------------
+Total tests analyzed: 1,041
+Distinct projects represented: 77
+
+636 tests | 56 projects | CRITSEARCH_BAD_LOCATION
+227 tests |  1 project  | BASELINE_BUILD_ENFORCER_FAILED
+ 77 tests |  5 projects | BASELINE_BUILD_RAT_FAILED
+ 27 tests |  2 projects | BASELINE_TEST_ENVIRONMENT_FAILED
+ 21 tests |  1 project  | BASELINE_UNRELATED_TEST_FAILED
+ 20 tests | 10 projects | PIPELINE_COMPLETED_NO_PATCH
+ 12 tests |  3 projects | BASELINE_TEST_SELECTION_FAILED
+ 12 tests |  7 projects | DELAYLOCS_TIMEOUT
+  3 tests |  1 project  | CRITSEARCH_CLASS_CIRCULARITY_ERROR
+  1 test  |  1 project  | BARRIERPOINTSEARCH_TIMEOUT
+  1 test  |  1 project  | BASELINE_BUILD_COMPILATION_FAILED
+  1 test  |  1 project  | BASELINE_TARGET_TEST_ERROR
+  1 test  |  1 project  | CRITSEARCH_NO_CRITICAL_POINTS
+  1 test  |  1 project  | CRITSEARCH_TIMEOUT
+  1 test  |  1 project  | DELTADEBUG_TIMEOUT
+
+
+Results by Original Detector
+----------------------------
+
+iDFlakies (33 tests):
+- 24 BASELINE_TEST_ENVIRONMENT_FAILED
+- 5 PIPELINE_COMPLETED_NO_PATCH
+- 2 CRITSEARCH_BAD_LOCATION
+- 1 BARRIERPOINTSEARCH_TIMEOUT
+- 1 DELAYLOCS_TIMEOUT
+
+NonDex (1,008 tests):
+- 634 CRITSEARCH_BAD_LOCATION
+- 227 BASELINE_BUILD_ENFORCER_FAILED
+- 77 BASELINE_BUILD_RAT_FAILED
+- 21 BASELINE_UNRELATED_TEST_FAILED
+- 15 PIPELINE_COMPLETED_NO_PATCH
+- 12 BASELINE_TEST_SELECTION_FAILED
+- 11 DELAYLOCS_TIMEOUT
+- 3 CRITSEARCH_CLASS_CIRCULARITY_ERROR
+- 3 BASELINE_TEST_ENVIRONMENT_FAILED
+- 1 BASELINE_BUILD_COMPILATION_FAILED
+- 1 BASELINE_TARGET_TEST_ERROR
+- 1 CRITSEARCH_NO_CRITICAL_POINTS
+- 1 CRITSEARCH_TIMEOUT
+- 1 DELTADEBUG_TIMEOUT
+
+
+Interpretation of Refined Statuses
+----------------------------------
+
+CRITSEARCH_BAD_LOCATION (636)
+FlakeSync's critical-point search rejected the minimized delay location and
+printed:
+
+"This location is not a good one. Go back and run minimizer again."
+
+No CriticalPoints.csv was produced. The runner subsequently invoked
+barrierpointsearch, which failed because that file did not exist. Therefore,
+these are classified by the earlier underlying cause rather than as genuine
+barrier-point-search failures. This occurred across 56 projects.
+
+CRITSEARCH_NO_CRITICAL_POINTS (1)
+For Flink's NFATest#testSimpleNFA, critical-search output files were produced,
+but they contained no usable critical/root-point records. Barrier-search
+output likewise contained no barrier-point records. This differs from the
+636 cases where CriticalPoints.csv was missing after CritSearch rejected the
+location.
+
+CRITSEARCH_CLASS_CIRCULARITY_ERROR (3)
+Three JUnit4 tests failed during critical-point search with
+java.lang.ClassCircularityError while running under FlakeSync's
+instrumentation/runtime environment.
+
+PIPELINE_COMPLETED_NO_PATCH (20)
+All six FlakeSync Maven phases returned successfully for these tests.
+However, inspection found no evidence of a generated/applied source-code
+repair. Where critical/root/barrier CSV outputs were available, they
+contained no data records. Repository inspection also found no tracked
+source modifications attributable to the patch phase. These 20 cases span
+10 projects.
+
+DELAYLOCS_TIMEOUT (12)
+FlakeSync's delay-location search exceeded the 1,800-second phase timeout
+while executing instrumented/delayed tests. These are phase timeouts and
+should not be interpreted as ordinary target-test failures.
+
+DELTADEBUG_TIMEOUT (1)
+For Pushy's
+ApnsClientTest#testSendNotificationWithPushTypeHeader, FlakeSync reproduced
+a test timeout under an injected delay and continued delta-debugging the
+delay value, but minimization did not complete within the 1,800-second
+phase timeout.
+
+CRITSEARCH_TIMEOUT (1)
+For Pushy's ApnsClientTest#testSendNotification, FlakeSync reproduced the
+target timeout under an injected delay of 800 and continued searching for
+critical points, but the phase did not complete within 1,800 seconds.
+
+BARRIERPOINTSEARCH_TIMEOUT (1)
+For SkyWalking's ConsumerTest#testConsumerMoreThanChannel, FlakeSync was
+actively evaluating candidate barrier/yield points. Some instrumented test
+executions increased from approximately 2 seconds to approximately 642
+seconds, and the search did not complete within the 1,800-second timeout.
+
+
+Baseline Failures
+-----------------
+A total of 366 tests could not proceed beyond the baseline stage. These
+were further separated according to the underlying cause rather than
+treating every baseline failure as a failure of the requested test.
+
+BASELINE_BUILD_ENFORCER_FAILED (227)
+All 227 cases came from jbpm. Maven Enforcer failed before the target tests
+ran because the jakarta.activation dependency was not managed.
+
+BASELINE_BUILD_RAT_FAILED (77)
+These occurred in five projects: Avro, Commons Collections, Commons JXPath,
+Commons Lang, and Maven Dependency Plugin. Apache RAT rejected files in the
+working trees before the target tests could be evaluated. Generated
+NonDex files contributed to the unapproved-file listings in several cases.
+
+BASELINE_TEST_ENVIRONMENT_FAILED (27)
+Twenty-four OpenNLP tests failed because expected evaluation/test-data
+configuration was unavailable. Three Gora tests failed with Ignite
+environment/state problems such as an already-existing table, missing
+local cache, or stale topology/affinity state.
+
+BASELINE_UNRELATED_TEST_FAILED (21)
+These occurred in JUnit4. Surefire executed the broader test suite and an
+unrelated TemporaryFolderUsageTest failed. These results therefore do not
+establish that the requested flaky test itself failed its baseline.
+
+BASELINE_TEST_SELECTION_FAILED (12)
+Eight incubator-kie-drools tests, three mybatis-flex tests, and one Tika
+test were blocked when Surefire rejected the requested test pattern in an
+earlier reactor module before reaching the intended target module.
+
+BASELINE_TARGET_TEST_ERROR (1)
+Gora's TestIgniteStore#testUpdate executed but errored during a SQL DML
+operation.
+
+BASELINE_BUILD_COMPILATION_FAILED (1)
+cloud-security-services-integration-library failed compilation before the
+target test ran because javax.annotation.PostConstruct could not be
+resolved.
+
+
+Important Methodological Note
+-----------------------------
+The original runner briefly classified 250 tests as
+CONCURRENTFIND_INSTRUMENTED_TEST_FAILED by searching phase logs for the
+text "Surefire failed when running tests." Investigation showed this was
+not reliable for multi-module Maven projects: parent modules could emit
+that message or report no matching tests while the intended downstream
+module subsequently ran the target test successfully and Maven returned
+BUILD SUCCESS.
+
+The heuristic was removed, the affected 250 tests were removed from the
+active results, and all 250 were rerun. The final 1,041-row dataset contains
+the corrected rerun results.
+
+Docker was used to parallelize the remaining reruns in isolated project
+working trees. Three early Docker results were produced while the temporary
+per-phase timeout was 300 seconds. Those rows were removed and rerun using
+the final 1,800-second timeout before the Docker results were merged.
+
+Final structural validation:
+- Rows: 1,041
+- Unique (project_url, sha, flakesync_test) keys: 1,041
+- Duplicate keys: 0
+
+
+Main Finding
+------------
+No tested case produced an observed FlakeSync source-code repair.
+
+The most common outcome was CRITSEARCH_BAD_LOCATION: 636 of 1,041 tests
+across 56 of 77 projects. FlakeSync reached critical-point analysis for
+these cases but rejected the minimized delay location and instructed that
+the minimizer be run again.
+
+An additional 366 tests were prevented from entering the FlakeSync
+pipeline by baseline build, environment, unrelated-suite, test-selection,
+or target-test errors.
+
+Twenty tests completed all six Maven phases, but artifact and repository
+inspection found no generated/applied source-code patch.

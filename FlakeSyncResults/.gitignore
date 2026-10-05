@@ -1,0 +1,13 @@
+# Large raw FlakeSync evidence retained locally
+logs/
+artifacts/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Intermediate/back-up files
+*.before-fix
+*.before-classification.csv
+*.before-concurrentfind-fix.csv
+*.before-docker-merge
